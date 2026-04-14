@@ -26,7 +26,8 @@ Ouvrez votre terminal (Git Bash) dans le dossier du projet et exécutez :
 
 ```bash
 composer install
-npm install```
+npm install
+```
 
 ### 2. Configuration de l'extension Excel (GD)
 Pour permettre l'exportation des fichiers Excel via **PhpSpreadsheet**, l'extension **GD** doit être activée sur votre serveur PHP.
@@ -39,7 +40,8 @@ Pour permettre l'exportation des fichiers Excel via **PhpSpreadsheet**, l'extens
 4.  Supprimez le point-virgule (`;`) pour activer l'extension :
 
 ```ini
-extension=gd```
+extension=gd
+```
 5.   Redémarrez Apache depuis le panneau XAMPP.
 
 Vérification de l'activation :
