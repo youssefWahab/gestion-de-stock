@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->string('article');
-            $table->string('atelier');
+            $table->string('categorie');
             $table->string('unite')->nullable();
             $table->integer('entree')->default(0);
             $table->integer('sortie')->default(0);

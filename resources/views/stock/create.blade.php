@@ -51,20 +51,14 @@
                     placeholder="Stock disponible">
             </div>
 
-             {{-- Atelier --}}
+             {{-- Catégorie --}}
             <div>
-                <label for="atelier" class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fa-solid fa-building text-indigo-500 mr-1"></i> Atelier
+                <label for="categorie" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fa-solid fa-building text-indigo-500 mr-1"></i> Catégorie
                 </label>
-                <select id="atelier" name="atelier" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" required>
-                    <option value="" disabled>Nom du atelier</option>
-                    <option value="soudor"   {{ old('atelier') == 'soudor' ? 'selected' : '' }}>Soudor</option>
-                    <option value="marbre" {{ old('atelier') == 'marbre' ? 'selected' : '' }}>Marber</option>
-                    <option value="ba 13" {{ old('atelier') == 'ba 13' ? 'selected' : '' }}>BA 13</option>
-                    <option value="aluminium" selected {{ old('atelier') == 'aluminium' ? 'selected' : '' }}>Aluminium</option>
-                    <option value="bois" selected {{ old('atelier') == 'bois' ? 'selected' : '' }}>Bois</option>
-                    <option value="amv" {{ old('atelier') == 'amv' ? 'selected' : '' }}>AMV</option>
-                </select>
+                <input type="text" id="categorie" name="categorie" value="{{ old('categorie') }}"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                    placeholder="Catégorie">
 
             </div>
 

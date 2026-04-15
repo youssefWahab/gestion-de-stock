@@ -54,7 +54,7 @@
 
                 <datalist id="stockList">
                     @foreach($stocks as $stock)
-                        <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }} - Atelier : {{ $stock->atelier}})</option>
+                        <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }} - Catégorie : {{ $stock->categorie}})</option>
                     @endforeach
                 </datalist>
 

@@ -19,11 +19,11 @@
             </a>
             <a href="{{ route('stock.export-excel') }}" class="bg-white text-gray-800 font-semibold px-3.5 py-2.5 rounded-xl shadow hover:shadow-lg transition-all duration-200 flex items-center gap-2.5">
                 <i class="fa-solid fa-file-excel border-2 border-green-600 py-0.5  px-1 rounded-full text-green-600 text-md"></i>
-                <span>Exporter</span>
+                <span>Inventaire</span>
             </a>
             <a href="{{ route('stock.export-excel-with-movements') }}" class="bg-white text-gray-800 font-semibold px-3.5 py-2.5 rounded-xl shadow hover:shadow-lg transition-all duration-200 flex items-center gap-2.5">
                 <i class="fa-solid fa-file-excel border-2 border-green-600 py-0.5  px-1 rounded-full text-green-600 text-md"></i>
-                <span>Exporter avec mouvements</span>
+                <span>Inventaire détaillé</span>
             </a>
         </div>
     </div>
@@ -56,7 +56,6 @@
                 <label for="filterArticle" class="block text-sm font-semibold text-gray-700 mb-1">
                     <i class="fa-solid fa-box text-gray-400 mr-1"></i> Article
                 </label>
-                {{-- <input type="text" id="filterArticle" name="filterArticle" value="{{ request('filterArticle') }}" placeholder="Filtrer par article"class="w-full rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"> --}}
                 <input 
                     list="articleList" 
                     id="filterArticle" 
@@ -75,19 +74,19 @@
 
             </div>
 
-            {{-- Search by Chantier --}}
+            {{-- Search by Category --}}
             <div>
-                <label for="filterAtelier" class="block text-sm font-semibold text-gray-700 mb-1">
-                    <i class="fa-solid fa-building text-gray-400 mr-1"></i> Atelier
+                <label for="filterCategories" class="block text-sm font-semibold text-gray-700 mb-1">
+                    <i class="fa-solid fa-tags text-gray-400 mr-1"></i> Catégorie
                 </label>
-                <input list="atelierList" type="text" id="filterAtelier" name="filterAtelier" 
-                    value="{{ request('filterAtelier') }}"
+                <input list="CategoriesList" type="text" id="filterCategories" name="filterCategories" 
+                    value="{{ request('filterCategories') }}"
                     class="w-full rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
-                    placeholder="Filtrer par atelier"
+                    placeholder="Filtrer par Catégorie"
                     autocomplete="off">
-                    <datalist id="atelierList">
-                    @foreach($ateliers as $atelier)
-                        <option value="{{ $atelier->atelier }}"></option>
+                    <datalist id="categoriesList">
+                    @foreach($categories as $categorie)
+                        <option value="{{ $categorie->categorie }}"></option>
                     @endforeach
                 </datalist>
             </div>
@@ -121,13 +120,13 @@
         <a href="{{ route('stock.export-sorties') }}" 
         class="bg-white text-gray-800 font-semibold px-4 py-2.5 rounded-xl shadow hover:shadow-lg transition-all duration-200 flex items-center gap-2">
             <i class="fa-solid fa-file-export border-2 border-red-600 py-0.5 px-1 rounded-full text-red-600 text-md"></i>
-            <span>Exporter Sorties</span>
+            <span>Exporter les Sorties</span>
         </a>
 
         <a href="{{ route('stock.export-entrees') }}" 
         class="bg-white text-gray-800 font-semibold px-4 py-2.5 rounded-xl shadow hover:shadow-lg transition-all duration-200 flex items-center gap-2">
             <i class="fa-solid fa-file-export border-2 border-green-600 py-0.5 px-1 rounded-full text-green-600 text-md"></i>
-            <span>Exporter Entrées</span>
+            <span>Exporter les Entrées</span>
         </a>
     </div>
 
@@ -141,7 +140,7 @@
                         Article
                     </th>
                     <th class="px-4 py-4 text-xs font-extrabold text-blue-700 uppercase tracking-widest">
-                        Atelier
+                        Catégorie
                     </th>
                     {{-- <th class="px-4 py-4 text-xs font-extrabold text-blue-700 uppercase tracking-widest">
                         Unite
@@ -170,7 +169,7 @@
                 @forelse($stocks as $stock)
                     <tr class="hover:bg-blue-50/40 transition">
                         <td class="px-4 py-2">{{ $stock->article }}</td>
-                        <td class="px-4 py-2">{{ $stock->atelier }}</td>
+                        <td class="px-4 py-2">{{ $stock->categorie }}</td>
                         {{-- <td class="px-4 py-2">{{ $stock->unite }}</td> --}}
                         <td class="px-4 py-2">
                             <span class="inline-flex items-center rounded px-3 py-1 text-sm font-semibold bg-red-100 text-red-800">

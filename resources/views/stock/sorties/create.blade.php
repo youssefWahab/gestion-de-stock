@@ -36,12 +36,6 @@
                     <label for="stock_id" class="block text-sm font-semibold text-gray-700 mb-2">
                         <i class="fa-solid fa-box text-gray-400 mr-1"></i> Article
                     </label>
-                    {{-- <select id="stock_id" name="stock_id" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
-                        <option value="">Sélectionner un article</option>
-                        @foreach($stocks as $stock)
-                            <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }})</option>
-                        @endforeach
-                    </select> --}}
                     <input 
                         list="stockList" 
                         id="stock_id" 
@@ -53,7 +47,7 @@
 
                     <datalist id="stockList">
                         @foreach($stocks as $stock)
-                            <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }} - Atelier : {{ $stock->atelier}})</option>
+                            <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }} - catégorie : {{ $stock->categorie}})</option>
                         @endforeach
                     </datalist>
 
@@ -79,62 +73,7 @@
                     <label for="reference" class="block text-sm font-semibold text-gray-700 mb-2">
                         <i class="fa-solid fa-receipt text-gray-400 mr-1"></i> Bon de livraison / Nom
                     </label>
-                    <input list="personnelList" type="text" id="reference" name="reference" value="{{ old('reference') }}" placeholder="Ex: BL-2023-001" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition">
-                    <datalist id="personnelList">
-                        <option value="5687">ILIENNEB ABDELWAKIL</option>
-                        <option value="3889">NEJAH MOHAMED</option>
-                        <option value="3997">EL FATIHI OUSSAMA</option>
-                        <option value="4320">BELBIYAD AHMED</option>
-                        <option value="4387">ZEGDI ABDERRAZZAK</option>
-                        <option value="4388">BOUTASSA AMINE</option>
-                        <option value="4434">ZERIAA OUSSAMA</option>
-                        <option value="4672">EL BALGHITI ABDELKHALEK</option>
-                        <option value="4683">BOURJA ABDELLAH</option>
-                        <option value="4868">KHOUYA-AMEUR LAHCEN</option>
-                        <option value="4939">SOUFIANE ENNOUNI</option>
-                        <option value="5076">EL KHAYAT ADIL</option>
-                        <option value="5122">OUZIAD ACHRAF</option>
-                        <option value="5123">IDBELLA AMINE</option>
-                        <option value="5124">BENGOUZI ADAM</option>
-                        <option value="5154">LOUALI ABDERRAHIM</option>
-                        <option value="5179">ENNOUNI ANAS</option>
-                        <option value="5181">ENNADY ABDESSAMIA</option>
-                        <option value="5230">BOUSSEBNI ANAS</option>
-                        <option value="5259">EL ARABI MOHAMED ALI</option>
-                        <option value="5260">AZOUY YOUSSEF</option>
-                        <option value="5825">AZOUY ANASS</option>
-                        <option value="5263">JOHARI NOUREDDINE</option>
-                        <option value="5273">ENNOUNI ABDELALI</option>
-
-                        <option value="5274">CHOUKAIRA HAMZA</option>
-                        <option value="5294">ZAKARIA OULHAJ</option>
-                        <option value="5317">RGUIG NASSIME</option>
-                        <option value="5319">KHAOUI ABDELKARIM</option>
-                        <option value="5320">MAROUANE JRIFI</option>
-                        <option value="5325">CHEMMI ZAKARIA</option>
-                        <option value="5327">ABDELLAH CHIBOUB</option>
-                        <option value="5329">HICHAM BAZHAR</option>
-                        <option value="5330">YASSINE SAADINI</option>
-                        <option value="5331">KHALID AIT AMAID</option>
-                        <option value="5334">ZAOUI WALID</option>
-                        <option value="5340">ECHABABE ILYAS</option>
-                        <option value="5342">BASGHIR ZAKARIA</option>
-                        <option value="5382">ELBARKAOUI JAMAL</option>
-                        <option value="5383">NICHA ABDELLATF</option>
-                        <option value="5477">AKALLABO MOUHSSINE</option>
-                        <option value="5519">MAHDAOUI NAFIA</option>
-                        <option value="5652">AMZIL AYOUB</option>
-                        <option value="5686">EL MORABIT ABDELJALIL</option>
-                        <option value="4243">ABDELLAH EL HAOUKALI</option>
-                        <option value="5429">Amine Bouafardou</option>
-                        <option value="4212">Oussama lehroumi</option>
-                        <option value="5428">Abderhmen Akebli </option>
-                        <option value="5766">ABDELJALIL RIAD</option>
-                        <option value="5882">ZAKARIA BALKHIR</option>
-                        <option value="1943">Hamid Soudor </option>
-                        <option value="4557">El Moum Abdelazize</option>
-                        <option value="4675">Assaka Mohamed</option>
-                    </datalist>
+                    <input type="text" id="reference" name="reference" value="{{ old('reference') }}" placeholder="Ex: BL-2023-001" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition">
 
                 </div>
 

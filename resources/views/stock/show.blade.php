@@ -24,10 +24,10 @@
             <span class="block text-xs text-gray-500 uppercase font-semibold">Article</span>
             <span class="block text-lg font-bold text-gray-800 mt-2">{{ $stock->article }}</span>
         </div>
-        {{-- Chantier --}}
+        {{-- Catégorie --}}
         <div>
-            <span class="block text-xs text-gray-500 uppercase font-semibold">Chantier</span>
-            <span class="block text-lg font-bold text-gray-800 mt-2">{{ $stock->chantier }}</span>
+            <span class="block text-xs text-gray-500 uppercase font-semibold">Catégorie</span>
+            <span class="block text-lg font-bold text-gray-800 mt-2">{{ $stock->categorie }}</span>
         </div>
         {{-- Date --}}
         <div>

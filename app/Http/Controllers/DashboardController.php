@@ -51,13 +51,11 @@ class DashboardController extends Controller
             return round(($q / $totalSorties) * 100, 1);
         });
 
-        // list of each atelier and its total (like 20 article for atelier A, 30 for B)
-        $atelierCounts = Stock::select('atelier', DB::raw('count(*) as total'))
-        ->groupBy('atelier')
-        ->orderBy('atelier')
+        $categorieCounts = Stock::select('categorie', DB::raw('count(*) as total'))
+        ->groupBy('categorie')
+        ->orderBy('categorie')
         ->get();
 
-        // return $atelierCounts;
         $productionsThisWeek = Production::whereBetween('created_at', [
         Carbon::now()->startOfWeek(),
         Carbon::now()->endOfWeek(),
@@ -117,7 +115,7 @@ class DashboardController extends Controller
             'stockLabels',
             'stockEntrees',
             'stockSorties',
-            'atelierCounts',
+            'categorieCounts',
             'productionLabels',// remove
             'productionQuantites',//remove
             'topSorties',

@@ -24,24 +24,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(3)->create();
-        FicheCommande::factory(10)->create();
-
-
-        DemandeAchat::factory(10)->create();
 
         Stock::factory(15)->create();
 
         Production::factory(5)->create();
-
-        Consommation::factory(10)->create();
-
-        ChargePersonnel::factory(10)->create();
-
-        ProductionArticle::factory(10)->create();
-
-        FicheArticle::factory(10)->create();
-
-        AchatArticle::factory(10)->create();
 
         StockMovement::factory()->count(25)->create();
 

@@ -46,7 +46,7 @@
                 />
                 <datalist id="stockList">
                     @foreach($stocks as $stock)
-                        <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }} - Atelier: {{ $stock->atelier }})</option>
+                        <option value="{{ $stock->id }}">{{ $stock->article }} (Stock actuel: {{ $stock->stockActuel }} - catégorie: {{ $stock->categorie }})</option>
                     @endforeach
                 </datalist>
             </div>
@@ -72,15 +72,7 @@
                 <label for="reference" class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fa-solid fa-user text-gray-400 mr-1"></i> Emprunteur
                 </label>
-                <input list="emprunteursList" type="text" id="reference" name="reference" value="{{ old('reference') }}" placeholder="Nom ou matricule" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
-                <datalist id="emprunteursList">
-                    <option value="5687">ILIENNEB ABDELWAKIL</option>
-                    <option value="3889">NEJAH MOHAMED</option>
-                    <option value="5330">YASSINE SAADINI</option>
-                    <option value="5429">Amine Bouafardou</option>
-                    <option value="4675">Assaka Mohamed</option>
-                    {{-- Add others if needed --}}
-                </datalist>
+                <input type="text" id="reference" name="reference" value="{{ old('reference') }}" placeholder="Nom ou matricule" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
             </div>
 
             {{-- Date --}}

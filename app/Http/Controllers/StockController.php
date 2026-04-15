@@ -18,7 +18,7 @@ class StockController extends Controller
     {
         $request->validate([
             'filterArticle' => 'nullable|string|max:50',
-            'filterAtelier' => 'nullable|string',
+            'filterCategories' => 'nullable|string',
             'stockMin' => 'nullable|integer',
             'stockMax' => 'nullable|numeric',
         ]);
@@ -27,8 +27,8 @@ class StockController extends Controller
         if ($request->filled('filterArticle')) {
             $query->where('article', 'like', '%' . $request->filterArticle . '%');
         }
-        if ($request->filled('filterAtelier')) {
-            $query->where('atelier', 'like', '%' . $request->filterAtelier . '%');
+        if ($request->filled('filterCategories')) {
+            $query->where('categorie', 'like', '%' . $request->filterCategories . '%');
         }
 
         if ($request->filled('stockMin') && $request->filled('stockMax')) {
@@ -40,11 +40,11 @@ class StockController extends Controller
         }
 
         $stocks = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-        $ateliers = Stock::select('atelier')->distinct()->get();
+        $categories = Stock::select('categorie')->distinct()->get();
         $articles = Stock::select('article')->distinct()->get();
 
         // return response()->json($ateliers);
-        return view('stock.index', compact('stocks', 'ateliers','articles'));
+        return view('stock.index', compact('stocks', 'categories','articles'));
     }
 
     /**
@@ -52,8 +52,6 @@ class StockController extends Controller
      */
     public function create()
     {
-        // You can also pass list of articles, fiches, or fournisseurs
-        // $articles = ['Article A', 'Article B', 'Article C'];
         return view('stock.create');
     }
 
@@ -65,7 +63,7 @@ class StockController extends Controller
         // Normally you would validate and save to DB
         $validated = $request->validate([
             'article' => 'required|string',
-            'atelier' => 'required|string',
+            'categorie' => 'required|string',
             'unite' => 'nullable|string|max:10',
             'entree' => 'required|integer',
             'stockInitial' => 'required|integer',
@@ -109,7 +107,7 @@ class StockController extends Controller
         $stock = Stock::findOrFail($id);
         $validated = $request->validate([
             'article' => 'required|string',
-            'atelier' => 'required|string',
+            'categorie' => 'required|string',
             'unite' => 'nullable|string|max:10',
             'entree' => 'required|integer',
             'stockInitial' => 'required|integer',
@@ -139,34 +137,28 @@ class StockController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        $stocks = Stock::orderBy('article', 'asc')->get()
-        ->groupBy(fn($s) => strtolower(trim($s->atelier)));
+        $stocksGrouped = Stock::orderBy('categorie', 'asc')
+            ->orderBy('article', 'asc')
+            ->get()
+            ->groupBy(fn($s) => strtoupper(trim($s->categorie)));
 
-        // Order of ateliers
-        $orderedAteliers = ['ba 13', 'marbre', 'soudor', 'aluminium', 'amv'];
+        $currentRow = 5;
+        $templateRow = 5;
 
-        $startRow = 5;
-        $currentRow = $startRow;
-
-        // Template row for styles
-        $templateRow = $startRow;
-
-        // Walk ateliers in the required order
-        foreach ($orderedAteliers as $atelier) {
-            if (!isset($stocks[$atelier])) {
-                continue;
-            }
-
-            foreach ($stocks[$atelier] as $index => $stock) {
+        foreach ($stocksGrouped as $catName => $items) {
+            
+            foreach ($items as $index => $stock) {
+                
                 foreach (range('G', 'M') as $col) {
                     $sheet->duplicateStyle($sheet->getStyle("{$col}{$templateRow}"), "{$col}{$currentRow}");
                 }
 
                 if ($index === 0) {
-                    $sheet->setCellValue("G{$currentRow}", strtoupper($stock->atelier));
+                    $sheet->setCellValue("G{$currentRow}", $catName);
                 } else {
-                    $sheet->setCellValue("G{$currentRow}", ''); // leave empty
+                    $sheet->setCellValue("G{$currentRow}", ''); 
                 }
+
                 $sheet->setCellValue("H{$currentRow}", $stock->article);
                 $sheet->setCellValue("I{$currentRow}", $stock->stockInitial);
                 $sheet->setCellValue("J{$currentRow}", $stock->unite ?? 'U');
@@ -197,39 +189,39 @@ class StockController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
+        // 1. Groupement dynamique par 'categorie' au lieu d'atelier
         $stocks = Stock::with('movements')
+            ->orderBy('categorie', 'asc')
             ->orderBy('article', 'asc')
             ->get()
-            ->groupBy(fn($s) => strtolower(trim($s->atelier)));
-
-        $orderedAteliers = ['ba 13', 'marbre', 'soudor', 'aluminium', 'amv'];
+            ->groupBy(fn($s) => strtoupper(trim($s->categorie)));
 
         $startRow    = 5;
         $currentRow  = $startRow;
         $templateRow = $startRow;
 
-        // Define header rows from template
         $headerRowEntree = 6;
         $dataRowEntree   = $headerRowEntree + 1;
 
         $headerRowSortie = 9;
         $dataRowSortie   = $headerRowSortie + 1;
 
-        foreach ($orderedAteliers as $atelier) {
-            if (!isset($stocks[$atelier])) {
-                continue;
-            }
+        // 2. On boucle sur les catégories existantes (plus besoin de $orderedAteliers)
+        foreach ($stocks as $categoryName => $items) {
 
-            foreach ($stocks[$atelier] as $index => $stock) {
+            foreach ($items as $index => $stock) {
                 $entrees = $stock->movements->where('type', 'entrée');
                 $sorties = $stock->movements->where('type', 'sortie');
 
                 // STOCK SUMMARY LINE
-                foreach (range('G', 'K') as $col) {
+                // J'ai étendu à 'L' pour couvrir tout le style du template
+                foreach (range('G', 'L') as $col) {
                     $sheet->duplicateStyle($sheet->getStyle("{$col}{$templateRow}"), "{$col}{$currentRow}");
                 }
+
+                // On utilise le nom de la catégorie ici
                 if ($index === 0) {
-                    $sheet->setCellValue("G{$currentRow}", strtoupper($stock->atelier));
+                    $sheet->setCellValue("G{$currentRow}", $categoryName);
                 } else {
                     $sheet->setCellValue("G{$currentRow}", '');
                 }
@@ -245,7 +237,6 @@ class StockController extends Controller
                 // ENTRÉES
                 // --------------------------
                 if ($entrees->count() > 0) {
-                    // Copy header row
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$headerRowEntree}"), "{$col}{$currentRow}");
                     }
@@ -256,28 +247,24 @@ class StockController extends Controller
                     $currentRow++;
 
                     $totalEntrees = 0;
-
                     foreach ($entrees as $mvt) {
                         foreach (range('G', 'L') as $col) {
                             $sheet->duplicateStyle($sheet->getStyle("{$col}{$dataRowEntree}"), "{$col}{$currentRow}");
                         }
-
                         $sheet->setCellValue("I{$currentRow}", $mvt->reference ?? '-');
                         $sheet->setCellValue("J{$currentRow}", $mvt->date_movement->format('d-m-Y'));
                         $sheet->setCellValue("K{$currentRow}", $mvt->quantite);
-
                         $totalEntrees += $mvt->quantite;
                         $currentRow++;
                     }
 
-                    // Total row
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$dataRowEntree}"), "{$col}{$currentRow}");
                     }
                     $sheet->setCellValue("H{$currentRow}", 'Total Entrées');
                     $sheet->setCellValue("K{$currentRow}", $totalEntrees);
                     $currentRow++;
-                }else{
+                } else {
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$headerRowEntree}"), "{$col}{$currentRow}");
                     }
@@ -289,11 +276,9 @@ class StockController extends Controller
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$dataRowEntree}"), "{$col}{$currentRow}");
                     }
-
                     $sheet->mergeCells("I{$currentRow}:K{$currentRow}");
                     $sheet->setCellValue("I{$currentRow}", 'Aucune entrée enregistrée');
                     $sheet->getStyle("I{$currentRow}:K{$currentRow}")->getFont()->setBold(true)->setItalic(true);
-
                     $currentRow++;
                 }
 
@@ -301,7 +286,6 @@ class StockController extends Controller
                 // SORTIES
                 // --------------------------
                 if ($sorties->count() > 0) {
-                    // Copy header row
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$headerRowSortie}"), "{$col}{$currentRow}");
                     }
@@ -312,28 +296,24 @@ class StockController extends Controller
                     $currentRow++;
 
                     $totalSorties = 0;
-
                     foreach ($sorties as $mvt) {
                         foreach (range('G', 'L') as $col) {
                             $sheet->duplicateStyle($sheet->getStyle("{$col}{$dataRowSortie}"), "{$col}{$currentRow}");
                         }
-
                         $sheet->setCellValue("I{$currentRow}", $mvt->reference ?? '-');
                         $sheet->setCellValue("J{$currentRow}", $mvt->date_movement->format('d-m-Y'));
                         $sheet->setCellValue("K{$currentRow}", $mvt->quantite);
-
                         $totalSorties += $mvt->quantite;
                         $currentRow++;
                     }
 
-                    // Total row
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$dataRowSortie}"), "{$col}{$currentRow}");
                     }
                     $sheet->setCellValue("H{$currentRow}", 'Total Sorties');
                     $sheet->setCellValue("K{$currentRow}", $totalSorties);
                     $currentRow++;
-                }else{
+                } else {
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$headerRowSortie}"), "{$col}{$currentRow}");
                     }
@@ -345,11 +325,9 @@ class StockController extends Controller
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$dataRowSortie}"), "{$col}{$currentRow}");
                     }
-
                     $sheet->mergeCells("I{$currentRow}:K{$currentRow}");
                     $sheet->setCellValue("I{$currentRow}", 'Aucune sortie enregistrée');
                     $sheet->getStyle("I{$currentRow}:K{$currentRow}")->getFont()->setBold(true)->setItalic(true);
-
                     $currentRow++;
                 }
             }
@@ -365,7 +343,7 @@ class StockController extends Controller
 
     public function exportEntreesToExcel()
     {
-       $templatePath = storage_path('templates/entrees_stock.xlsx');
+        $templatePath = storage_path('templates/entrees_stock.xlsx');
 
         if (!file_exists($templatePath)) {
             return redirect()->back()->with('error', "Template Excel introuvable: {$templatePath}");
@@ -374,41 +352,41 @@ class StockController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Fetch only stocks that have 'entrée' movements
+        // 1. Groupement dynamique par 'categorie'
         $stocks = Stock::with(['movements' => function ($q) {
                 $q->where('type', 'entrée');
             }])
             ->whereHas('movements', function ($q) {
                 $q->where('type', 'entrée');
             })
-            ->orderBy('article', 'asc')
+            ->orderBy('categorie', 'asc') // Tri par catégorie
+            ->orderBy('article', 'asc')   // Puis par article
             ->get()
-            ->groupBy(fn($s) => strtolower(trim($s->atelier)));
+            ->groupBy(fn($s) => strtoupper(trim($s->categorie))); // Groupement en majuscules
 
-        $orderedAteliers = ['ba 13', 'marbre', 'soudor', 'aluminium', 'amv'];
-
-        $startRow   = 5; // Where real data begins (ignore headers)
+        $startRow   = 5; 
         $currentRow = $startRow;
 
-        foreach ($orderedAteliers as $atelier) {
-            if (!isset($stocks[$atelier])) continue;
+        // 2. Boucle dynamique sur les catégories
+        foreach ($stocks as $categoryName => $items) {
 
-            foreach ($stocks[$atelier] as $index => $stock) {
+            foreach ($items as $index => $stock) {
                 foreach ($stock->movements as $mvt) {
-                    // Duplicate style from template row if needed
+                    
+                    // Dupliquer le style (Plage G à L)
                     foreach (range('G', 'L') as $col) {
                         $sheet->duplicateStyle($sheet->getStyle("{$col}{$startRow}"), "{$col}{$currentRow}");
                     }
+
+                    // Affichage de la catégorie sur la première ligne de l'article seulement
                     if ($index === 0) {
-                        $sheet->setCellValue("G{$currentRow}", strtoupper($stock->atelier));
+                        $sheet->setCellValue("G{$currentRow}", $categoryName);
                     } else {
                         $sheet->setCellValue("G{$currentRow}", '');
                     }
 
-                    // Fill data
-                    // $sheet->setCellValue("G{$currentRow}", strtoupper($stock->atelier));
-                    
-                    $sheet->setCellValue("H{$currentRow}", strtoupper($stock->article)); // Article name
+                    // Remplissage des données
+                    $sheet->setCellValue("H{$currentRow}", strtoupper($stock->article));
                     $sheet->setCellValue("I{$currentRow}", $mvt->quantite);
                     $sheet->setCellValue("J{$currentRow}", $stock->unite ?? 'U');
                     $sheet->setCellValue("K{$currentRow}", $mvt->reference ?? '-');
@@ -427,68 +405,68 @@ class StockController extends Controller
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
     public function exportSortiesToExcel()
-{
-    $templatePath = storage_path('templates/sorties_stock.xlsx');
+    {
+        $templatePath = storage_path('templates/sorties_stock.xlsx');
 
-    if (!file_exists($templatePath)) {
-        return redirect()->back()->with('error', "Template Excel introuvable: {$templatePath}");
-    }
+        if (!file_exists($templatePath)) {
+            return redirect()->back()->with('error', "Template Excel introuvable: {$templatePath}");
+        }
 
-    $spreadsheet = IOFactory::load($templatePath);
-    $sheet = $spreadsheet->getActiveSheet();
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
-    // Fetch only stocks that have 'sortie' or 'emprunt' movements
-    $stocks = Stock::with(['movements' => function ($q) {
-            $q->whereIn('type', ['sortie', 'emprunt']);
-        }])
-        ->whereHas('movements', function ($q) {
-            $q->whereIn('type', ['sortie', 'emprunt']);
-        })
-        ->orderBy('article', 'asc')
-        ->get()
-        ->groupBy(fn($s) => strtolower(trim($s->atelier)));
+        // 1. Groupement dynamique par 'categorie' au lieu de 'atelier'
+        $stocks = Stock::with(['movements' => function ($q) {
+                $q->whereIn('type', ['sortie', 'emprunt']);
+            }])
+            ->whereHas('movements', function ($q) {
+                $q->whereIn('type', ['sortie', 'emprunt']);
+            })
+            ->orderBy('categorie', 'asc') // Tri par catégorie
+            ->orderBy('article', 'asc')   // Puis par article
+            ->get()
+            ->groupBy(fn($s) => strtoupper(trim($s->categorie)));
 
-    $orderedAteliers = ['ba 13', 'marbre', 'soudor', 'aluminium', 'amv'];
+        $startRow   = 5; 
+        $currentRow = $startRow;
 
-    $startRow   = 5; // Where real data begins (ignore headers)
-    $currentRow = $startRow;
+        // 2. Boucle dynamique sur les catégories présentes en base
+        foreach ($stocks as $categoryName => $items) {
 
-    foreach ($orderedAteliers as $atelier) {
-        if (!isset($stocks[$atelier])) continue;
+            foreach ($items as $index => $stock) {
+                foreach ($stock->movements as $mvt) {
+                    
+                    // Dupliquer le style (Plage G à L)
+                    foreach (range('G', 'L') as $col) {
+                        $sheet->duplicateStyle($sheet->getStyle("{$col}{$startRow}"), "{$col}{$currentRow}");
+                    }
 
-        foreach ($stocks[$atelier] as $index => $stock) {
-            foreach ($stock->movements as $mvt) {
-                // Duplicate style from template row if needed
-                foreach (range('G', 'L') as $col) {
-                    $sheet->duplicateStyle($sheet->getStyle("{$col}{$startRow}"), "{$col}{$currentRow}");
+                    // Affichage de la catégorie sur la première ligne de l'article seulement
+                    if ($index === 0) {
+                        $sheet->setCellValue("G{$currentRow}", $categoryName);
+                    } else {
+                        $sheet->setCellValue("G{$currentRow}", '');
+                    }
+
+                    // Remplissage des données
+                    $sheet->setCellValue("H{$currentRow}", strtoupper($stock->article));
+                    $sheet->setCellValue("I{$currentRow}", $mvt->quantite);
+                    $sheet->setCellValue("J{$currentRow}", $stock->unite ?? 'U');
+                    $sheet->setCellValue("K{$currentRow}", $mvt->reference ?? '-');
+                    $sheet->setCellValue("L{$currentRow}", $mvt->date_movement->format('d-m-Y'));
+
+                    $currentRow++;
                 }
-
-                // Show atelier name only on first line
-                if ($index === 0) {
-                    $sheet->setCellValue("G{$currentRow}", strtoupper($stock->atelier));
-                } else {
-                    $sheet->setCellValue("G{$currentRow}", '');
-                }
-
-                // Fill data
-                $sheet->setCellValue("H{$currentRow}", strtoupper($stock->article)); // Article name
-                $sheet->setCellValue("I{$currentRow}", $mvt->quantite);
-                $sheet->setCellValue("J{$currentRow}", $stock->unite ?? 'U');
-                $sheet->setCellValue("K{$currentRow}", $mvt->reference ?? '-');
-                $sheet->setCellValue("L{$currentRow}", $mvt->date_movement->format('d-m-Y'));
-
-                $currentRow++;
             }
         }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'SORTIES STOCK ' . now()->format('d-m-y') . '.xlsx';
+        $filePath = storage_path("app/public/{$fileName}");
+
+        $writer->save($filePath);
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
-
-    $writer = new Xlsx($spreadsheet);
-    $fileName = 'SORTIES STOCK ' . now()->format('d-m-y') . '.xlsx';
-    $filePath = storage_path("app/public/{$fileName}");
-
-    $writer->save($filePath);
-    return response()->download($filePath)->deleteFileAfterSend(true);
-}
 
 
 

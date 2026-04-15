@@ -27,7 +27,7 @@ class StockMovementController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('stock', function ($q2) use ($search) {
                     $q2->where('article', 'like', "%{$search}%")
-                    ->orWhere('atelier', 'like', "%{$search}%");
+                    ->orWhere('categorie', 'like', "%{$search}%");
                 })
                 ->orWhere('reference', 'like', "%{$search}%");
             });
@@ -47,7 +47,7 @@ class StockMovementController extends Controller
 
     public function createEntree()
     {
-        $stocks = Stock::select(["id", "article", "stockActuel", "atelier"])->orderBy('article')->get();
+        $stocks = Stock::select(["id", "article", "stockActuel", "categorie"])->orderBy('article')->get();
         $date = Carbon::now('Europe/Paris')->format('Y-m-d\TH:i');
         return view('stock.entrees.create', compact('stocks','date'));
     }
@@ -102,21 +102,12 @@ class StockMovementController extends Controller
 
         $sorties = StockMovement::with('stock:id,article')
             ->where('type', 'sortie')
-            // ->when($validated['filterArticle'] ?? null, function ($query, $article) {
-            //     $query->whereHas('stock', fn($q) => $q->where('article', 'like', "%{$article}%"));
-            // })
-            // ->when($validated['filterSearch'] ?? null, fn($query, $search) =>
-            //     $query->where(function($q) use ($search) {
-            //         $q->whereHas('stock', fn($q2) => $q2->where('article', 'like', "%{$search}%"))
-            //         ->whereHas('stock', fn($q2) => $q2->where('atelier', 'like', "%{$search}%"))
-            //           ->orWhere('reference', 'like', "%{$search}%");
-            //     })
-            // )
+
             ->when($validated['filterSearch'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('stock', function ($q2) use ($search) {
                         $q2->where('article', 'like', "%{$search}%")
-                        ->orWhere('atelier', 'like', "%{$search}%");
+                        ->orWhere('categorie', 'like', "%{$search}%");
                     })
                     ->orWhere('reference', 'like', "%{$search}%");
                 });
@@ -138,7 +129,7 @@ class StockMovementController extends Controller
 
     public function createSortie()
     {
-        $stocks = Stock::select(['id', 'article', 'stockActuel', "atelier"])->orderBy('article')->get();
+        $stocks = Stock::select(['id', 'article', 'stockActuel', "categorie"])->orderBy('article')->get();
         $date = Carbon::now('Europe/Paris')->format('Y-m-d\TH:i');    
         return view('stock.sorties.create', compact('stocks','date'));
     }
@@ -203,7 +194,7 @@ class StockMovementController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('stock', function ($q2) use ($search) {
                     $q2->where('article', 'like', "%{$search}%")
-                       ->orWhere('atelier', 'like', "%{$search}%");
+                       ->orWhere('categorie', 'like', "%{$search}%");
                 })
                 ->orWhere('reference', 'like', "%{$search}%");
             });
@@ -224,7 +215,7 @@ class StockMovementController extends Controller
 }
     public function createEmprunt()
     {
-        $stocks = Stock::select(['id', 'article', 'stockActuel', 'atelier'])->orderBy('article')->get();
+        $stocks = Stock::select(['id', 'article', 'stockActuel', 'categorie'])->orderBy('article')->get();
         $date = Carbon::now('Europe/Paris')->format('Y-m-d\TH:i');
         return view('stock.emprunts.create', compact('stocks','date'));
     }
@@ -484,7 +475,7 @@ class StockMovementController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('stock', function ($q2) use ($search) {
                         $q2->where('article', 'like', "%{$search}%")
-                            ->orWhere('atelier', 'like', "%{$search}%");
+                            ->orWhere('categorie', 'like', "%{$search}%");
                     })
                     ->orWhere('reference', 'like', "%{$search}%");
                 });
@@ -506,13 +497,11 @@ class StockMovementController extends Controller
 
     public function createRetour()
     {
-        // $stocks = Stock::select(['id', 'article', 'stockActuel', 'atelier'])->orderBy('article')->get();
-        $sorties = StockMovement::with('stock:id,article,atelier')
+        $sorties = StockMovement::with('stock:id,article')
             ->where('type', 'sortie')
             ->orderBy('date_movement', 'desc')
             ->get();
         $date = Carbon::now('Europe/Paris')->format('Y-m-d\TH:i');
-        // return response()->json($sorties);
         return view('stock.retours.create', compact('sorties','date'));
     }
     public function editRetour($id)

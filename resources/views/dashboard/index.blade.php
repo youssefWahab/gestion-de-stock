@@ -66,13 +66,13 @@
 
         <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
             <h3 class="text-lg font-bold text-gray-700 mb-4">
-                <i class="fa-solid fa-tools text-blue-500 mr-2"></i> Ateliers et leur total
+                <i class="fa-solid fa-tools text-blue-500 mr-2"></i> catégories et leur total
             </h3>
             <ul class="space-y-2.5">
-                @foreach($atelierCounts as $atelier)
+                @foreach($categorieCounts as $categorie)
                     <li class="flex justify-between items-center bg-blue-50 px-3 py-2 rounded-lg hover:shadow">
-                        <span class="font-medium text-gray-700">{{ $atelier->atelier }}</span>
-                        <span class="font-bold text-blue-600">{{ $atelier->total }}</span>
+                        <span class="font-medium text-gray-700">{{ $categorie->categorie }}</span>
+                        <span class="font-bold text-blue-600">{{ $categorie->total }}</span>
                     </li>
                 @endforeach
             </ul>

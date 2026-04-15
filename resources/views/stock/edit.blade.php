@@ -37,14 +37,14 @@
                    placeholder="Nom de l'article" required>
         </div>
 
-        {{-- Atelier --}}
+        {{-- Category --}}
         <div>
-            <label for="atelier" class="block text-sm font-semibold text-gray-700 mb-1">
-                <i class="fa-solid fa-building text-gray-400 mr-1"></i> atelier
+            <label for="categorie" class="block text-sm font-semibold text-gray-700 mb-1">
+                <i class="fa-solid fa-tags text-gray-400 mr-1"></i> Catégorie
             </label>
-            <input type="text" id="atelier" name="atelier" value="{{ old('atelier', $stock['atelier']) }}"
+            <input type="text" id="categorie" name="categorie" value="{{ old('categorie', $stock['categorie']) }}"
                    class="w-full border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                   placeholder="Nom du atelier" required>
+                   placeholder="Nom du Catégorie" required>
         </div>
 
         {{-- Unite --}}

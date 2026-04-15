@@ -12,7 +12,7 @@ class Stock extends Model
     protected $fillable = [
         'article',
         'chantier',
-        'atelier',
+        'categorie',
         'unite',
         'sortie',
         'stockInitial',

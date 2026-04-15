@@ -48,7 +48,7 @@
 
                 <datalist id="sortiesList">
                     @foreach($sorties as $sortie)
-                        <option value="{{ $sortie->id }}">{{ $sortie->stock->article }} (Sorties: {{ $sortie->quantite }} - Atelier : {{ $sortie->stock->atelier}} - Reference : {{ $sortie->reference }})</option>
+                        <option value="{{ $sortie->id }}">{{ $sortie->stock->article }} (Sorties: {{ $sortie->quantite }} - Reference : {{ $sortie->reference }})</option>
                     @endforeach
                 </datalist>
 
