@@ -25,12 +25,6 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(3)->create();
 
-        Stock::factory(15)->create();
-
-        Production::factory(5)->create();
-
-        StockMovement::factory()->count(25)->create();
-
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
